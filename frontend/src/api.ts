@@ -1,5 +1,16 @@
 import type { Health, Job, OutputFormat, Scale } from "./types";
 
+// The frontend can be hosted separately from the FastAPI backend (for example,
+// Vercel frontend + Render backend). Keep every API request pointed at the
+// same backend instead of relying on the browser's current origin.
+const API_BASE_URL = (
+  import.meta.env.VITE_API_BASE_URL || "https://pro-image-enhancer.onrender.com"
+).replace(/\/$/, "");
+
+function apiUrl(path: string): string {
+  return `${API_BASE_URL}${path}`;
+}
+
 async function parseError(res: Response): Promise<string> {
   try {
     const body = await res.json();
@@ -10,7 +21,7 @@ async function parseError(res: Response): Promise<string> {
 }
 
 export async function fetchHealth(): Promise<Health> {
-  const res = await fetch("/api/health");
+  const res = await fetch(apiUrl("/api/health"));
   if (!res.ok) throw new Error(await parseError(res));
   return res.json();
 }
@@ -26,7 +37,7 @@ export async function createJob(params: {
   form.append("scale", String(params.scale));
   form.append("output_format", params.outputFormat);
   form.append("confirm", params.confirm ? "true" : "false");
-  const res = await fetch("/api/jobs", { method: "POST", body: form });
+  const res = await fetch(apiUrl("/api/jobs"), { method: "POST", body: form });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     const error = new Error(body.detail || res.statusText) as Error & {
@@ -41,26 +52,26 @@ export async function createJob(params: {
 }
 
 export async function getJob(id: string): Promise<Job> {
-  const res = await fetch(`/api/jobs/${id}`);
+  const res = await fetch(apiUrl(`/api/jobs/${id}`));
   if (!res.ok) throw new Error(await parseError(res));
   return res.json();
 }
 
 export async function cancelJob(id: string): Promise<Job> {
-  const res = await fetch(`/api/jobs/${id}/cancel`, { method: "POST" });
+  const res = await fetch(apiUrl(`/api/jobs/${id}/cancel`), { method: "POST" });
   if (!res.ok) throw new Error(await parseError(res));
   return res.json();
 }
 
 export async function deleteJob(id: string): Promise<void> {
-  const res = await fetch(`/api/jobs/${id}`, { method: "DELETE" });
+  const res = await fetch(apiUrl(`/api/jobs/${id}`), { method: "DELETE" });
   if (!res.ok) throw new Error(await parseError(res));
 }
 
 export function originalUrl(id: string) {
-  return `/api/jobs/${id}/original`;
+  return apiUrl(`/api/jobs/${id}/original`);
 }
 
 export function resultUrl(id: string) {
-  return `/api/jobs/${id}/result`;
+  return apiUrl(`/api/jobs/${id}/result`);
 }
