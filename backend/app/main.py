@@ -13,8 +13,8 @@ from app.jobs import JobError, JobManager, output_media_type
 from app.storage import JobStorage
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-# Vercel's deployed filesystem is read-only except for /tmp. Keep the bundled
-# ONNX model in the repository, while storing per-job files in temporary space.
+# Render and Vercel provide writable temporary storage at /tmp. Keep the
+# bundled ONNX model in the repository and store per-job files in /tmp.
 DATA_DIR = Path(os.environ.get("PIE_DATA_DIR", "/tmp/pie/jobs"))
 MODELS_DIR = Path(os.environ.get("PIE_MODELS_DIR", str(REPO_ROOT / "data" / "models")))
 
@@ -48,6 +48,16 @@ def create_app() -> FastAPI:
     async def job_error_handler(_request, exc: JobError):
         payload = {"detail": str(exc), **exc.extra}
         return JSONResponse(status_code=exc.status_code, content=payload)
+
+    @app.get("/")
+    def root():
+        return {
+            "name": "Pro Image Enhancer API",
+            "status": "ok",
+            "health": "/api/health",
+            "docs": "/docs",
+            "api": "/api",
+        }
 
     @app.get("/api/health")
     def health():
