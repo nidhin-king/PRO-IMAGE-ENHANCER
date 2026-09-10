@@ -12,8 +12,11 @@ from app.inference import InferenceEngine
 from app.jobs import JobError, JobManager, output_media_type
 from app.storage import JobStorage
 
-DATA_DIR = Path(os.environ.get("PIE_DATA_DIR", "/workspace/data/jobs"))
-MODELS_DIR = Path(os.environ.get("PIE_MODELS_DIR", "/workspace/data/models"))
+REPO_ROOT = Path(__file__).resolve().parents[2]
+# Vercel's deployed filesystem is read-only except for /tmp. Keep the bundled
+# ONNX model in the repository, while storing per-job files in temporary space.
+DATA_DIR = Path(os.environ.get("PIE_DATA_DIR", "/tmp/pie/jobs"))
+MODELS_DIR = Path(os.environ.get("PIE_MODELS_DIR", str(REPO_ROOT / "data" / "models")))
 
 
 def _use_stub() -> bool:
