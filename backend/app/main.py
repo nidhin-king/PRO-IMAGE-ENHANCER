@@ -59,6 +59,23 @@ def create_app() -> FastAPI:
             "api": "/api",
         }
 
+    @app.get("/api")
+    def api_root():
+        return {
+            "name": "Pro Image Enhancer API",
+            "status": "ok",
+            "health": "/api/health",
+            "docs": "/docs",
+            "endpoints": {
+                "create_job": "POST /api/jobs",
+                "get_job": "GET /api/jobs/{job_id}",
+                "cancel_job": "POST /api/jobs/{job_id}/cancel",
+                "delete_job": "DELETE /api/jobs/{job_id}",
+                "original": "GET /api/jobs/{job_id}/original",
+                "result": "GET /api/jobs/{job_id}/result",
+            },
+        }
+
     @app.get("/api/health")
     def health():
         info = engine.health()
