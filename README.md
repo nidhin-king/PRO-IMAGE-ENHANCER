@@ -117,22 +117,15 @@ Frontend proxies `/api` to `http://127.0.0.1:8000`.
 
 ## Vercel (frontend only)
 
-Vercel can host the React UI. It cannot run the FastAPI Real-ESRGAN worker (long CPU jobs, ONNX, tiled inference).
-
-```bash
-# from repo root
-npx vercel --prod --yes
-```
-
-Root Directory is the repo root. `vercel.json` builds `frontend` and publishes `frontend/dist`.
-
-To point the deployed UI at a separately hosted API, set:
+Vercel hosts the React UI. It cannot run the FastAPI Real-ESRGAN worker (long CPU jobs, ONNX, tiled inference). The production UI calls the Render API by default:
 
 ```text
-VITE_API_BASE_URL=https://your-api-host.example
+https://pro-image-enhancer.onrender.com
 ```
 
-in the Vercel project environment, then redeploy. Leave it empty for local Vite proxy use.
+Override with `VITE_API_BASE_URL` in Vercel project settings, then redeploy.
+
+The Vercel project Root Directory is `frontend`. `vercel.json` runs `npm install` / `npm run build` and publishes `dist`.
 
 ## Testing
 
