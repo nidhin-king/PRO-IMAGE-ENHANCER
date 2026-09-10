@@ -13,3 +13,5 @@ frontend/test-results/
 *.egg-info/
 .env
 .env.local
+.vercel
+frontend/.vercel
