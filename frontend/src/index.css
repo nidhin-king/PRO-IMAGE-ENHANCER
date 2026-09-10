@@ -1,0 +1,56 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #7c3aed;
+  --color-on-primary: #ffffff;
+  --color-secondary: #6366f1;
+  --color-accent: #0891b2;
+  --color-background: #0f172a;
+  --color-foreground: #ffffff;
+  --color-muted: #171939;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-destructive: #dc2626;
+  --color-ring: #7c3aed;
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  min-height: 100dvh;
+}
+
+body {
+  margin: 0;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: "Open Sans", "Segoe UI", sans-serif;
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: "Poppins", "Segoe UI", sans-serif;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
