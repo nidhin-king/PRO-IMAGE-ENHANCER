@@ -16,7 +16,16 @@ MODEL_SCALE = 4
 class InferenceEngine:
     def __init__(self, models_dir: Path, use_stub: bool = False) -> None:
         self.models_dir = Path(models_dir)
-        self.models_dir.mkdir(parents=True, exist_ok=True)
+        # Vercel's project bundle is read-only. The bundled model already exists
+        # in data/models, so never try to mkdir it during function startup.
+        if not self.models_dir.exists() and self.models_dir != Path(os.environ.get("PIE_MODELS_DIR", str(self.models_dir))):
+            self.models_dir = Path("/tmp/pie/models")
+        if not self.models_dir.exists():
+            try:
+                self.models_dir.mkdir(parents=True, exist_ok=True)
+            except OSError:
+                self.models_dir = Path("/tmp/pie/models")
+                self.models_dir.mkdir(parents=True, exist_ok=True)
         self.use_stub = use_stub
         self.session = None
         self.device = "cpu"
@@ -50,6 +59,8 @@ class InferenceEngine:
 
         model_path = self._ensure_model()
         providers = self._providers()
+        if not providers:
+            raise RuntimeError("onnxruntime is not available in this deployment")
         so = ort.SessionOptions()
         so.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
         intra = max(1, min(4, os.cpu_count() or 2))
